@@ -75,6 +75,8 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
     try {
         const { CEDULA, UBICACION } = req.body;
 
+        console.log(`📍 Datos recibidos:`, { CEDULA, UBICACION });
+
         if (!CEDULA || !UBICACION) {
             return res.status(400).json({ 
                 success: false,
@@ -82,17 +84,32 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
             });
         }
 
-        // Formatear los datos para MCM_PRUEBAS
-        const ubicacionFormato = typeof UBICACION === 'object'
-            ? `${UBICACION.latitude},${UBICACION.longitude}`
-            : UBICACION;
+        // Normalizar CEDULA a string
+        const cedulaString = CEDULA.toString().trim();
+
+        // Asegurar que UBICACION es un string en formato "latitud,longitud"
+        let ubicacionFormato = UBICACION;
+        
+        if (typeof UBICACION === 'object') {
+            // Si viene como objeto, convertir a string
+            ubicacionFormato = `${UBICACION.latitude},${UBICACION.longitude}`;
+        }
+
+        // Validar que sea un formato válido
+        if (typeof ubicacionFormato !== 'string' || !ubicacionFormato.includes(',')) {
+            console.error(`❌ Formato de ubicación inválido: ${ubicacionFormato}`);
+            return res.status(400).json({
+                success: false,
+                error: "Formato de ubicación inválido. Debe ser 'latitud,longitud'"
+            });
+        }
 
         const payload = {
-            CEDULA: CEDULA,
+            CEDULA: cedulaString,
             UBICACION: ubicacionFormato
         };
 
-        console.log(`📍 Enviando ubicación para cédula ${CEDULA}: ${ubicacionFormato}`);
+        console.log(`📍 Enviando a MCM_PRUEBAS:`, payload);
 
         // Enviar a MCM_PRUEBAS
         const response = await fetch(MCM_PRUEBAS_URL, {
@@ -104,7 +121,7 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
         const data = await response.json();
 
         if (response.ok) {
-            console.log(`✅ Ubicación enviada correctamente para: ${CEDULA}`);
+            console.log(`✅ Ubicación enviada correctamente para: ${cedulaString}`);
             res.json({
                 success: true,
                 mensaje: "Ubicación enviada correctamente",
@@ -122,7 +139,8 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
         console.error("Error al enviar ubicación:", err);
         res.status(500).json({ 
             success: false,
-            error: "Error al enviar ubicación" 
+            error: "Error al enviar ubicación",
+            details: err.message
         });
     }
 });
