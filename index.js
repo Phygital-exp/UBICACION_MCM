@@ -87,20 +87,20 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
         // Normalizar CEDULA a string
         const cedulaString = CEDULA.toString().trim();
 
-        // Asegurar que UBICACION es un string en formato "latitud,longitud"
+        // Asegurar que UBICACION es un string en formato "(latitud,longitud)" con paréntesis
         let ubicacionFormato = UBICACION;
         
         if (typeof UBICACION === 'object') {
-            // Si viene como objeto, convertir a string
-            ubicacionFormato = `${UBICACION.latitude},${UBICACION.longitude}`;
+            // Si viene como objeto, convertir a string con paréntesis
+            ubicacionFormato = `(${UBICACION.latitude},${UBICACION.longitude})`;
         }
 
-        // Validar que sea un formato válido
-        if (typeof ubicacionFormato !== 'string' || !ubicacionFormato.includes(',')) {
+        // Validar que sea un formato válido (debe tener paréntesis y coma)
+        if (typeof ubicacionFormato !== 'string' || !ubicacionFormato.includes(',') || !ubicacionFormato.includes('(')) {
             console.error(`❌ Formato de ubicación inválido: ${ubicacionFormato}`);
             return res.status(400).json({
                 success: false,
-                error: "Formato de ubicación inválido. Debe ser 'latitud,longitud'"
+                error: "Formato de ubicación inválido. Debe ser '(latitud,longitud)'"
             });
         }
 
