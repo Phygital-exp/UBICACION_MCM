@@ -73,36 +73,24 @@ app.get("/api/validar", async (req, res) => {
 // ========== ENDPOINT PARA ENVIAR UBICACIÓN ==========
 app.post("/api/enviar-ubicacion", async (req, res) => {
     try {
-        const { CEDULA, UBICACION } = req.body;
+        const { CEDULA, LATITUD, LONGITUD } = req.body;
 
-        console.log(`📍 Datos recibidos:`, { CEDULA, UBICACION });
+        console.log(`📍 Datos recibidos:`, { CEDULA, LATITUD, LONGITUD });
 
-        if (!CEDULA || !UBICACION) {
+        if (!CEDULA || LATITUD === undefined || LONGITUD === undefined) {
             return res.status(400).json({ 
                 success: false,
-                mensaje: "Cédula o ubicación no proporcionada"
+                mensaje: "Cédula, latitud o longitud no proporcionada"
             });
         }
 
         // Normalizar CEDULA a string
         const cedulaString = CEDULA.toString().trim();
 
-        // Asegurar que UBICACION es un string en formato "(latitud,longitud)" con paréntesis
-        let ubicacionFormato = UBICACION;
-        
-        if (typeof UBICACION === 'object') {
-            // Si viene como objeto, convertir a string con paréntesis
-            ubicacionFormato = `(${UBICACION.latitude},${UBICACION.longitude})`;
-        }
+        // Construir ubicación en formato "(latitud,longitud)" con paréntesis
+        const ubicacionFormato = `(${LATITUD},${LONGITUD})`;
 
-        // Validar que sea un formato válido (debe tener paréntesis y coma)
-        if (typeof ubicacionFormato !== 'string' || !ubicacionFormato.includes(',') || !ubicacionFormato.includes('(')) {
-            console.error(`❌ Formato de ubicación inválido: ${ubicacionFormato}`);
-            return res.status(400).json({
-                success: false,
-                error: "Formato de ubicación inválido. Debe ser '(latitud,longitud)'"
-            });
-        }
+        console.log(`📍 Ubicación construida: ${ubicacionFormato}`);
 
         const payload = {
             CEDULA: cedulaString,
