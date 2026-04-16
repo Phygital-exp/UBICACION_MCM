@@ -83,13 +83,15 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
 
         const cedulaString = CEDULA.toString().trim();
 
-        // ✅ CORREGIDO: Se envían LATITUD y LONGITUD por separado
+        // ✅ Combinar LATITUD y LONGITUD en formato UBICACION: (latitud,longitud)
+        const ubicacion = `(${LATITUD},${LONGITUD})`;
+
         const payload = {
             CEDULA: cedulaString,
-            LATITUD: LATITUD.toString(),
-            LONGITUD: LONGITUD.toString()
+            UBICACION: ubicacion
         };
 
+        console.log(`📍 Ubicación combinada:`, ubicacion);
         console.log(`📍 Enviando a MCM_PRUEBAS:`, JSON.stringify(payload, null, 2));
 
         const response = await fetch(MCM_PRUEBAS_URL, {
