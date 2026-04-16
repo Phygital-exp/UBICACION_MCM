@@ -86,8 +86,8 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
         // ✅ CORREGIDO: Se envían LATITUD y LONGITUD por separado
         const payload = {
             CEDULA: cedulaString,
-            LATITUD: LATITUD.toString(),
-            LONGITUD: LONGITUD.toString()
+            LATITUD: parseFloat(LATITUD),
+            LONGITUD: parseFloat(LONGITUD)
         };
 
         console.log(`📍 Enviando a MCM_PRUEBAS:`, JSON.stringify(payload, null, 2));
