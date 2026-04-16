@@ -109,7 +109,9 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
             UBICACION: ubicacionFormato
         };
 
-        console.log(`📍 Enviando a MCM_PRUEBAS:`, payload);
+        console.log(`📍 Enviando a MCM_PRUEBAS:`, JSON.stringify(payload, null, 2));
+        console.log(`📍 Tipo de CEDULA:`, typeof cedulaString, cedulaString);
+        console.log(`📍 Tipo de UBICACION:`, typeof ubicacionFormato, ubicacionFormato);
 
         // Enviar a MCM_PRUEBAS
         const response = await fetch(MCM_PRUEBAS_URL, {
@@ -118,7 +120,9 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
             body: JSON.stringify(payload)
         });
 
+        console.log(`📍 Response status:`, response.status);
         const data = await response.json();
+        console.log(`📍 Response data:`, JSON.stringify(data, null, 2));
 
         if (response.ok) {
             console.log(`✅ Ubicación enviada correctamente para: ${cedulaString}`);
@@ -175,10 +179,22 @@ app.get("/health", (req, res) => {
     res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
+// ========== DEBUG: Ver datos recibidos ==========
+app.post("/api/debug", (req, res) => {
+    console.log("=== DEBUG DATA ===");
+    console.log("Headers:", req.headers);
+    console.log("Body:", JSON.stringify(req.body, null, 2));
+    res.json({ 
+        received: req.body,
+        message: "Datos recibidos en debug"
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`🚀 Servidor proxy escuchando en puerto ${PORT}`);
     console.log(`📍 Endpoints disponibles:`);
     console.log(`   - GET  /api/validar?cedula=XXXXX`);
     console.log(`   - POST /api/enviar-ubicacion`);
+    console.log(`   - POST /api/debug`);
     console.log(`   - GET  /health`);
 });
