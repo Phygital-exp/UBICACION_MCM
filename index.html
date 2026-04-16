@@ -280,8 +280,8 @@
 
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
-                // Formatear ubicación como "latitud,longitud"
-                const ubicacion = `${pos.coords.latitude},${pos.coords.longitude}`;
+                // Formatear ubicación como "(latitud,longitud)" con paréntesis
+                const ubicacion = `(${pos.coords.latitude},${pos.coords.longitude})`;
 
                 const payload = {
                     CEDULA: usuarioValidado.CEDULA || document.getElementById('cedula-display').textContent,
