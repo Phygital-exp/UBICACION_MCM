@@ -9,7 +9,6 @@ const AUTH_HEADERS = {
     "Content-Type": "application/json",
 };
 
-// URLs de los APIs
 const MCM_USUARIOS_URL = "https://botai.smartdataautomation.com/api_backend_ai/dinamic-db/report/119/MCM_USUARIOS";
 const MCM_PRUEBAS_URL = "https://botai.smartdataautomation.com/api_backend_ai/dinamic-db/report/119/MCM_PRUEBAS";
 
@@ -30,7 +29,6 @@ app.get("/api/validar", async (req, res) => {
 
         console.log(`Validando cédula: ${cedula}`);
 
-        // Obtener todos los usuarios de MCM_USUARIOS
         const response = await fetch(MCM_USUARIOS_URL, { headers: AUTH_HEADERS });
         
         if (!response.ok) {
@@ -39,7 +37,6 @@ app.get("/api/validar", async (req, res) => {
 
         const data = await response.json();
         
-        // Buscar el usuario por cédula
         let usuarioEncontrado = null;
         
         if (data.result && Array.isArray(data.result)) {
@@ -84,24 +81,17 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
             });
         }
 
-        // Normalizar CEDULA a string
         const cedulaString = CEDULA.toString().trim();
 
-        // Construir ubicación en formato "(latitud,longitud)" con paréntesis
-        const ubicacionFormato = `(${LATITUD},${LONGITUD})`;
-
-        console.log(`📍 Ubicación construida: ${ubicacionFormato}`);
-
+        // ✅ CORREGIDO: Se envían LATITUD y LONGITUD por separado
         const payload = {
             CEDULA: cedulaString,
-            UBICACION: ubicacionFormato
+            LATITUD: LATITUD.toString(),
+            LONGITUD: LONGITUD.toString()
         };
 
         console.log(`📍 Enviando a MCM_PRUEBAS:`, JSON.stringify(payload, null, 2));
-        console.log(`📍 Tipo de CEDULA:`, typeof cedulaString, cedulaString);
-        console.log(`📍 Tipo de UBICACION:`, typeof ubicacionFormato, ubicacionFormato);
 
-        // Enviar a MCM_PRUEBAS
         const response = await fetch(MCM_PRUEBAS_URL, {
             method: 'POST',
             headers: AUTH_HEADERS,
@@ -140,14 +130,12 @@ app.post("/api/enviar-ubicacion", async (req, res) => {
 // ========== ENDPOINT ANTIGUO (MANTENER PARA COMPATIBILIDAD) ==========
 app.get("/api/Levapan/pdv", async (req, res) => {
     try {
-        // Determinar qué API usar según el parámetro 'tipo'
         const tipo = req.query.tipo;
         let apiUrl;
         
         if (tipo === 'independiente') {
             apiUrl = "https://botai.smartdataautomation.com/api_backend_ai/dinamic-db/report/119/Levapan_PDVs_independientes";
         } else {
-            // Por defecto, usar la API de modernos (o todos)
             apiUrl = "https://botai.smartdataautomation.com/api_backend_ai/dinamic-db/report/119/Levapan_PDVs";
         }
         
@@ -167,7 +155,7 @@ app.get("/health", (req, res) => {
     res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// ========== DEBUG: Ver datos recibidos ==========
+// ========== DEBUG ==========
 app.post("/api/debug", (req, res) => {
     console.log("=== DEBUG DATA ===");
     console.log("Headers:", req.headers);
